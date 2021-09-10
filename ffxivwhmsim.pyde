@@ -8,6 +8,7 @@ for FFXIV's white mage class.
 commit schedule
 .   draw an icon :P be able to tint the alpha to make it look unavailable
 .   font: meiryo is the ffxiv font
+.   method to resize 48x48 border shadow and overlay on top of icon 
     add little circle that animates
         see https://puu.sh/IadsX/d92dbbdd1c.jpg
     timer for the 2.5s GCD, among others
@@ -38,7 +39,7 @@ additions
 
 
 def setup():
-    global benison, holy, regen
+    global benison, holy, regen, border
     
     colorMode(HSB, 360, 100, 100, 100)
     rectMode(CENTER)
@@ -49,31 +50,40 @@ def setup():
     textFont(mono)
     noSmooth()
     
+    # unlike the other images, border.png is a transparent glass frame that's off center
+    # it actually provides shading on all four sides;
+    #     3 pixels each side
+    #     1 px on top
+    #     5 px on bottom
+    # this essentially makes the center 42x42
+    border = loadImage("icons/border.png")
+    border.resize(76,76)
     benison = loadImage("icons/divine benison.png")
     holy = loadImage("icons/holy.png")
     regen = loadImage("icons/regen.png")
     
 
 def draw():
-    global benison, holy, regen
+    global benison, holy, regen, border
         
     background(209, 95, 33)
     
-    # this is the alpha tint for images
-    tint(0, 0, 100, 100)
-    image(benison, width/2, height/2)
-    
-    
-    tint(0, 0, 100, 80)
-    image(holy, width/2+68, height/2)
-    
-    
-    tint(0, 0, 100, 40)
-    image(regen, width/2+68+68, height/2)
-    # image(benison, mouseX, mouseY)
+    draw_icon(benison, 100, width/2, height/2)    
+    draw_icon(holy, 80, width/2+68, height/2)    
+    draw_icon(regen, 50, width/2+68+68, height/2)
+
     
     # remember that bit-shifting twice to the right is dividing by 4
-    text("Divine Benison, Holy, and Regen\nCody Berry", width>>2, height>>2)
+    text("Divine Benison, Holy, and Regen\n[Cody Berry, Lv.72 White Mage]", width>>2, height>>2)
+
+
+# displays a 64x64 icon and adjusts the border appropriately
+def draw_icon(img, a, x, y):
+    # a is the alpha value
+    tint(0, 0, 100, a)
+    image(img, x, y)
+    tint(0, 0, 100, 100)
+    image(border, x-6, y-3)   
     
 
 def mousePressed():
