@@ -34,6 +34,9 @@ additions
     yellow proc dashed outline effect
     add tank cooldown rotation
     spell evolution: speed, potency, mana
+
+small additions
+    let icons quickly fade in after cooling down. objects required with show
   
 '''
 import os
@@ -63,10 +66,13 @@ def setup():
     # we can use draw_icon as is, or resize to 38 and resize the icons to 32x32
     #     modify x and y coordinates in draw_icon to -3, -1.5 instead of -6, -3
     border = loadImage("icons/border.png")
-    border.resize(76, 76)
+    border.resize(38, 38)
     benison = loadImage("icons/divine benison.png")
+    benison.resize(32, 32)
     holy = loadImage("icons/holy.png")
+    holy.resize(32, 32)
     regen = loadImage("icons/regen.png")
+    regen.resize(32, 32)
 
     # alien = createShape(GROUP)
     
@@ -88,9 +94,9 @@ def draw():
     if benison_alpha_full:
         draw_icon(benison, 100, width/2, height/2)
     else:
-        draw_icon(benison, 50, width/2, height/2)
-    draw_icon(holy, 75, width/2+68, height/2)    
-    draw_icon(regen, 100, width/2+68+68, height/2)
+        draw_icon(benison, 30, width/2, height/2)
+    draw_icon(holy, 75, width/2+34, height/2)    
+    draw_icon(regen, 100, width/2+68, height/2)
 
     
     # remember that bit-shifting twice to the right is dividing by 4
@@ -110,8 +116,11 @@ def draw():
         if c > 3*PI/2:
             benison_alpha_full = True
         else:            
+            # blendMode(OVERLAY)
+            # blendMode(DARKEST)
             blendMode(ADD)
-            arc(width/2+32, height/2+32, 62, 64, -PI/2, c, PIE)
+            # arc(width/2+32, height/2+32, 62, 64, -PI/2, c, PIE)
+            arc(width/2+16, height/2+16, 31, 32, -PI/2, c, PIE)
             blendMode(BLEND)
     cooldown += 0.6
         
@@ -122,7 +131,7 @@ def draw_icon(img, a, x, y):
     tint(0, 0, 100, a)
     image(img, x, y)
     tint(0, 0, 100, 100)
-    image(border, x-6, y-3)   
+    image(border, x-3, y-1)   
     
 
 def mousePressed():
