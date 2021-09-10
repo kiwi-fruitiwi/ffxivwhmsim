@@ -11,7 +11,12 @@ commit schedule
 .   method to resize 48x48 border shadow and overlay on top of icon 
 .   add little circle that animates. use arc!
 .       see https://puu.sh/IadsX/d92dbbdd1c.jpg
-    timer for the 2.5s GCD, among others
+.   cooldown effect
+        contour? blendmode?
+        custom pShape with contour
+        noFill inner shape?
+    timer class for the 2.5s GCD, among others
+        .isfinished? or global gamestates of GCD-locked, oGCD-locked?
         when I perform an action
     create 3 spells: benison, holy, regen
         record sounds
@@ -34,19 +39,15 @@ additions
     yellow proc dashed outline effect
     add tank cooldown rotation
     spell evolution: speed, potency, mana
-
-small additions
-    let icons quickly fade in after cooling down. objects required with show
   
 '''
-import os
 
 def setup():
     global benison, holy, regen, border, cooldown, benison_alpha_full, action
     
     colorMode(HSB, 360, 100, 100, 100)
     rectMode(CENTER)
-    size(640, 360)
+    size(640, 360, P2D)
     
     mono = createFont("Meiryo-01.ttf", 12)
     # mono = createFont("MeiryoUI-03.ttf", 12)
@@ -66,13 +67,10 @@ def setup():
     # we can use draw_icon as is, or resize to 38 and resize the icons to 32x32
     #     modify x and y coordinates in draw_icon to -3, -1.5 instead of -6, -3
     border = loadImage("icons/border.png")
-    border.resize(38, 38)
+    border.resize(76, 76)
     benison = loadImage("icons/divine benison.png")
-    benison.resize(32, 32)
     holy = loadImage("icons/holy.png")
-    holy.resize(32, 32)
     regen = loadImage("icons/regen.png")
-    regen.resize(32, 32)
 
     # alien = createShape(GROUP)
     
@@ -90,49 +88,77 @@ def draw():
     global benison, holy, regen, border, cooldown, benison_alpha_full, action
         
     background(209, 95, 33)
-    
+        
     if benison_alpha_full:
         draw_icon(benison, 100, width/2, height/2)
     else:
-        draw_icon(benison, 30, width/2, height/2)
-    draw_icon(holy, 75, width/2+34, height/2)    
-    draw_icon(regen, 100, width/2+68, height/2)
+        draw_icon(benison, 100, width/2, height/2)
+    draw_icon(holy, 100, width/2+68, height/2)    
+    draw_icon(regen, 100, width/2+68+68, height/2)
 
     
     # remember that bit-shifting twice to the right is dividing by 4
     fill(0, 0, 100, 100)
     text("Divine Benison, Holy, and Regen\n[Cody Berry, Lv.72 White Mage]", width>>2, height>>2)
-    stroke(0, 0, 100)
-    strokeWeight(1.5)
     
     # this needs to be calculated to fit the start, stop arguments as they are positive
     # clockwise starting at 0 vs our timer which is clockwise starting at PI/2
     # negative arguments aren't allowed?
     
-    fill(0, 0, 100, 30)
     # fills the arc so when cooldown ranges from 0-100, the arc completes 2π
     if action:
         c = map(cooldown, 0, 100, -PI/2, 3*PI/2)
         if c > 3*PI/2:
             benison_alpha_full = True
         else:            
-            # blendMode(OVERLAY)
-            # blendMode(DARKEST)
+            noStroke()
+            # winry: drawing background color over it simulates icon transparency
+            fill(209, 95, 33, 20)
+            rect(width/2+32, height/2+32, 64, 64)
+            
+            stroke(0, 0, 100)
+            strokeWeight(1.5)
             blendMode(ADD)
-            # arc(width/2+32, height/2+32, 62, 64, -PI/2, c, PIE)
-            arc(width/2+16, height/2+16, 31, 32, -PI/2, c, PIE)
+            fill(0, 0, 100, 15)
+            arc(width/2+32, height/2+32, 62, 64, -PI/2, c, PIE)
             blendMode(BLEND)
     cooldown += 0.6
-        
-
+    
+    draw_window()
+    
+    
 # displays a 64x64 icon and adjusts the border appropriately
 def draw_icon(img, a, x, y):
     # a is the alpha value
     tint(0, 0, 100, a)
     image(img, x, y)
-    tint(0, 0, 100, 100)
-    image(border, x-3, y-1)   
+    # tint(0, 0, 100, 100)
+    # image(border, x-6, y-3)   
     
+# draws a square with a negative internal square
+def draw_window():
+    s = createShape()
+    s.beginShape()
+    s.fill(0)
+    s.stroke(255)
+    s.strokeWeight(2)
+    o=50
+    i=40
+    # Exterior part of shape, clockwise winding
+    s.vertex(-o, -o)
+    s.vertex(o, -o)
+    s.vertex(o, o)
+    s.vertex(-o, o)
+    # Interior part of shape, counter-clockwise winding
+    s.beginContour()
+    s.vertex(-i, -i)
+    s.vertex(-i, i)
+    s.vertex(i, i)
+    s.vertex(i, -i)
+    s.endContour()
+    # Finishing off shape
+    s.endShape(CLOSE)
+    shape(s, mouseX, mouseY)
 
 def mousePressed():
     global action, cooldown, benison_alpha_full
