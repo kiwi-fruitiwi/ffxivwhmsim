@@ -12,13 +12,13 @@ commit schedule
 .   add little circle that animates. use arc!
 .       see https://puu.sh/IadsX/d92dbbdd1c.jpg
 .   cooldown effect
-        contour? blendmode?
-        custom pShape with contour
-        noFill inner shape?
+.       contour? blendmode? blendmode cannot restore lost alpha
+.   custom pShape with contour. this caused crashes
+.   noFill inner shape? doesn't work unless your "shape" is the stroke :P
     timer class for the 2.5s GCD, among others
         .isfinished? or global gamestates of GCD-locked, oGCD-locked?
         when I perform an action
-    create 3 spells: benison, holy, regen
+.   create 3 spells: benison, holy, regen
         record sounds
         rip images
     push hotkey to activate empty spell + sound
@@ -71,17 +71,6 @@ def setup():
     benison = loadImage("icons/divine benison.png")
     holy = loadImage("icons/holy.png")
     regen = loadImage("icons/regen.png")
-
-    # alien = createShape(GROUP)
-    
-    # ellipseMode(CORNER)
-    # head = createShape(ELLIPSE, -25, 0, 50, 50)
-    # head.setFill(color(255));
-    # body = createShape(RECT, -25, 45, 50, 40)
-    # body.setFill(color(0))
-
-    # alien.addChild(body);
-    # alien.addChild(head);
     
 
 def draw():
@@ -92,7 +81,7 @@ def draw():
     if benison_alpha_full:
         draw_icon(benison, 100, width/2, height/2)
     else:
-        draw_icon(benison, 100, width/2, height/2)
+        draw_icon(benison, 75, width/2, height/2)
     draw_icon(holy, 100, width/2+68, height/2)    
     draw_icon(regen, 100, width/2+68+68, height/2)
 
@@ -124,46 +113,17 @@ def draw():
             blendMode(BLEND)
     cooldown += 0.6
     
-    draw_window()
-    
     
 # displays a 64x64 icon and adjusts the border appropriately
 def draw_icon(img, a, x, y):
     # a is the alpha value
     tint(0, 0, 100, a)
     image(img, x, y)
-    # tint(0, 0, 100, 100)
-    # image(border, x-6, y-3)   
-    
-# draws a square with a negative internal square
-def draw_window():
-    s = createShape()
-    s.beginShape()
-    s.fill(0)
-    s.stroke(255)
-    s.strokeWeight(2)
-    o=50
-    i=40
-    # Exterior part of shape, clockwise winding
-    s.vertex(-o, -o)
-    s.vertex(o, -o)
-    s.vertex(o, o)
-    s.vertex(-o, o)
-    # Interior part of shape, counter-clockwise winding
-    s.beginContour()
-    s.vertex(-i, -i)
-    s.vertex(-i, i)
-    s.vertex(i, i)
-    s.vertex(i, -i)
-    s.endContour()
-    # Finishing off shape
-    s.endShape(CLOSE)
-    shape(s, mouseX, mouseY)
+    tint(0, 0, 100, 100)
+    image(border, x-6, y-3)   
 
 def mousePressed():
     global action, cooldown, benison_alpha_full
-    print(millis())
-    
     action = True
     benison_alpha_full = False
     cooldown = 0
