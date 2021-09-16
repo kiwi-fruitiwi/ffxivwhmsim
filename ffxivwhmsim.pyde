@@ -66,11 +66,11 @@ def setup():
     # this essentially makes the center 42x42
     # we can use draw_icon as is, or resize to 38 and resize the icons to 32x32
     #     modify x and y coordinates in draw_icon to -3, -1.5 instead of -6, -3
-    border = loadImage("icons/border.png")
+    border = loadImage("border.png")
     border.resize(76, 76)
-    benison = loadImage("icons/divine benison.png")
-    holy = loadImage("icons/holy.png")
-    regen = loadImage("icons/regen.png")
+    benison = loadImage("whm/divine benison.png")
+    holy = loadImage("whm/holy.png")
+    regen = loadImage("whm/regen.png")
     
 
 def draw():
